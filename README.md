@@ -36,9 +36,6 @@ PORT=5101 python backend/app.py
 - nginx vhost: `/etc/nginx/sites-enabled/feed.theones.io` (proxy_pass to :5101)
 - runtime data: `/home/vizi/feed.theones.io/runtime/` (cache + .env)
 
-## Architecture origin
-Ported from `luna-news` (beauty industry portal by same author).
-Adapted for AI/ADHD niche: new sources, English content, dark theme, ND positioning.
 
 ## License
 MIT

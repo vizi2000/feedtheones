@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#c4677b">
+    <title>Offline — The Ones AI Feed</title>
+    <link rel="manifest" href="/manifest.json">
+    <link rel="apple-touch-icon" href="/static/img/apple-touch-icon.png">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Inter', system-ui, sans-serif;
+            background: linear-gradient(135deg, #fdf8f6 0%, #faf2ee 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+            color: #3a2a2e;
+        }
+        .offline-card {
+            max-width: 480px;
+            text-align: center;
+            background: #fff;
+            border-radius: 28px;
+            padding: 48px 36px;
+            box-shadow: 0 30px 80px rgba(196, 103, 123, 0.18);
+            border: 1px solid #f0e1dc;
+        }
+        .offline-icon {
+            font-size: 72px;
+            margin-bottom: 16px;
+            display: inline-block;
+            animation: float 3s ease-in-out infinite;
+        }
+        @keyframes float {
+            0%, 100% { transform: translateY(0) rotate(-5deg); }
+            50% { transform: translateY(-8px) rotate(5deg); }
+        }
+        h1 {
+            font-family: 'Inter', system-ui, sans-serif;
+            font-size: 36px;
+            font-weight: 600;
+            margin-bottom: 14px;
+            background: linear-gradient(135deg, #a44a5f, #c4677b);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        p {
+            font-size: 16px;
+            line-height: 1.6;
+            color: #6b5559;
+            margin-bottom: 28px;
+        }
+        .retry-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 14px 32px;
+            background: linear-gradient(135deg, #c4677b, #a44a5f);
+            color: #fff;
+            border: none;
+            border-radius: 100px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            box-shadow: 0 6px 18px rgba(164, 74, 95, 0.35);
+            transition: all 0.2s;
+        }
+        .retry-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 24px rgba(164, 74, 95, 0.5);
+        }
+        .brand {
+            margin-top: 36px;
+            font-family: 'Inter', system-ui, sans-serif;
+            font-size: 22px;
+            font-weight: 600;
+            letter-spacing: 0.12em;
+            color: #c4677b;
+        }
+    </style>
+</head>
+<body>
+    <div class="offline-card">
+        <div class="offline-icon">🌙</div>
+        <h1>Offline</h1>
+        <p>Looks like you are offline. Check your internet connection and try again.<br><br>Previously viewed articles are available offline.</p>
+        <button class="retry-btn" onclick="window.location.reload()">↻ Try again</button>
+        <div class="brand">🌙 The Ones AI Feed</div>
+    </div>
+    <script>
+        // Auto-reload when connection is restored
+        window.addEventListener('online', () => window.location.reload());
+    </script>
+</body>
+</html>

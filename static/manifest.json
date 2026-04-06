@@ -1,0 +1,32 @@
+{
+    "name": "The Ones AI Feed — Curated AI News",
+    "short_name": "AI Feed",
+    "description": "Curated AI news from 16 sources, rewritten 4x daily across 7 categories: models, research, open source, cloud, business, news, community.",
+    "start_url": "/?source=pwa",
+    "scope": "/",
+    "display": "standalone",
+    "orientation": "portrait-primary",
+    "background_color": "#0a0a0f",
+    "theme_color": "#6366f1",
+    "lang": "en-US",
+    "dir": "ltr",
+    "categories": ["news", "technology", "productivity"],
+    "prefer_related_applications": false,
+    "icons": [
+        {"src": "/static/img/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any"},
+        {"src": "/static/img/icon-256.png", "sizes": "256x256", "type": "image/png", "purpose": "any"},
+        {"src": "/static/img/icon-384.png", "sizes": "384x384", "type": "image/png", "purpose": "any"},
+        {"src": "/static/img/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any"},
+        {"src": "/static/img/icon-192-maskable.png", "sizes": "192x192", "type": "image/png", "purpose": "maskable"},
+        {"src": "/static/img/icon-512-maskable.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable"}
+    ],
+    "shortcuts": [
+        {
+            "name": "Today on The Ones AI Feed",
+            "short_name": "Today",
+            "description": "Today's curated AI stories",
+            "url": "/?source=pwa-shortcut",
+            "icons": [{"src": "/static/img/icon-192.png", "sizes": "192x192"}]
+        }
+    ]
+}

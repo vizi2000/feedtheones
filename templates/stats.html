@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#c4677b">
+    <title>Stats — The Ones AI Feed</title>
+    <link rel="manifest" href="/manifest.json">
+    <link rel="apple-touch-icon" href="/static/img/apple-touch-icon.png">
+    <link rel="icon" type="image/png" href="/static/img/favicon-32.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body class="stats-page">
+
+    <div class="bg-blob blob-1"></div>
+    <div class="bg-blob blob-2"></div>
+
+    <header class="site-header">
+        <div class="container header-inner">
+            <a href="/" class="brand">
+                <span class="brand-mark">🌙</span>
+                <span class="brand-text">
+                    <span class="brand-name">AI Feed</span>
+                    <span class="brand-sub">NEWS</span>
+                </span>
+            </a>
+            <nav class="site-nav">
+                <a href="/" class="nav-back">← Home</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="stats-main container">
+        <header class="stats-header">
+            <p class="hero-eyebrow">📊 Panel statystyk</p>
+            <h1 class="stats-title">Stats The Ones AI Feed</h1>
+            <p class="stats-subtitle">What your visitors read</p>
+        </header>
+
+        <!-- Big numbers -->
+        <section class="stats-tiles" id="stats-tiles">
+            <div class="stat-tile">
+                <div class="stat-tile-icon">👁️</div>
+                <div class="stat-tile-value" id="stat-views">—</div>
+                <div class="stat-tile-label">Total views</div>
+            </div>
+            <div class="stat-tile">
+                <div class="stat-tile-icon">📰</div>
+                <div class="stat-tile-value" id="stat-articles">—</div>
+                <div class="stat-tile-label">Thuytane articles</div>
+            </div>
+            <div class="stat-tile">
+                <div class="stat-tile-icon">↗</div>
+                <div class="stat-tile-value" id="stat-shares">—</div>
+                <div class="stat-tile-label">Shares</div>
+            </div>
+            <div class="stat-tile">
+                <div class="stat-tile-icon">💖</div>
+                <div class="stat-tile-value" id="stat-saves">—</div>
+                <div class="stat-tile-label">Saved</div>
+            </div>
+            <div class="stat-tile">
+                <div class="stat-tile-icon">📲</div>
+                <div class="stat-tile-value" id="stat-installs">—</div>
+                <div class="stat-tile-label">Instalacje PWA</div>
+            </div>
+        </section>
+
+        <!-- Pre-rewriter status -->
+        <section class="stats-section">
+            <h2 class="section-heading">Pre-rewriter (LLM w tle)</h2>
+            <div class="prerewriter-card" id="prerewriter-card">
+                <div class="loader"></div>
+            </div>
+        </section>
+
+        <!-- 7-day timeline -->
+        <section class="stats-section">
+            <h2 class="section-heading">Ostatnie 7 dni</h2>
+            <div class="timeline-card" id="timeline-card">
+                <div class="loader"></div>
+            </div>
+        </section>
+
+        <!-- Top articles -->
+        <section class="stats-section">
+            <h2 class="section-heading">Top 10 articles</h2>
+            <div class="top-articles" id="top-articles">
+                <div class="loader"></div>
+            </div>
+        </section>
+
+        <!-- Categories + sources -->
+        <div class="stats-grid">
+            <section class="stats-section">
+                <h2 class="section-heading">Top kategorie</h2>
+                <div class="top-list" id="top-categories"></div>
+            </section>
+            <section class="stats-section">
+                <h2 class="section-heading">Top sources</h2>
+                <div class="top-list" id="top-sources"></div>
+            </section>
+            <section class="stats-section">
+                <h2 class="section-heading">Shares by platform</h2>
+                <div class="top-list" id="top-platforms"></div>
+            </section>
+        </div>
+    </main>
+
+    <footer class="site-footer">
+        <div class="container">
+            <div class="footer-brand"><span>🌙</span><span>The Ones AI Feed</span></div>
+            <p class="footer-tagline">Daily AI news curated for ADHD &amp; neurodivergent developers ⚡</p>
+        </div>
+    </footer>
+
+    <script>
+    (function() {
+        function fmtNum(n) {
+            if (n === undefined || n === null) return '0';
+            if (n >= 1000) return (n / 1000).toFixed(1).replace('.0','') + 'k';
+            return String(n);
+        }
+        function escapeHtml(s) {
+            return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+                .replace(/"/g,'&quot;');
+        }
+        function fmtTime(ts) {
+            if (!ts) return '';
+            const d = new Date(ts * 1000);
+            return d.toLocaleString('pl-PL');
+        }
+
+        async function loadStats() {
+            try {
+                const [stats, prerw] = await Promise.all([
+                    fetch('/api/stats').then(r => r.json()),
+                    fetch('/api/prerewriter/stats').then(r => r.json()),
+                ]);
+                renderTiles(stats);
+                renderPreRewriter(prerw);
+                renderTimeline(stats.timeline_7d || []);
+                renderTopArticles(stats.top_articles || []);
+                renderTopList('top-categories', stats.top_categories || [], 'key', 'views', 'views');
+                renderTopList('top-sources', stats.top_sources || [], 'name', 'views', 'views');
+                renderTopList('top-platforms', stats.shares_by_platform || [], 'platform', 'count', 'razy');
+            } catch (err) {
+                console.error('stats load failed', err);
+                document.body.querySelectorAll('.loader').forEach(l => {
+                    l.parentNode.innerHTML = '<p style="text-align:center;color:var(--c-deep-rose);padding:20px;">Failed to load stats</p>';
+                });
+            }
+        }
+
+        function renderTiles(d) {
+            document.getElementById('stat-views').textContent = fmtNum(d.total_views);
+            document.getElementById('stat-articles').textContent = fmtNum(d.unique_articles);
+            document.getElementById('stat-shares').textContent = fmtNum(d.total_shares);
+            document.getElementById('stat-saves').textContent = fmtNum(d.total_saves);
+            document.getElementById('stat-installs').textContent = fmtNum(d.total_installs);
+        }
+
+        function renderPreRewriter(d) {
+            const card = document.getElementById('prerewriter-card');
+            const lastRun = d.last_run_started ? fmtTime(d.last_run_started) : '—';
+            card.innerHTML = `
+                <div class="prerewriter-grid">
+                    <div class="pr-stat"><div class="pr-num">${fmtNum(d.queued)}</div><div class="pr-lbl">Zakolejkowane</div></div>
+                    <div class="pr-stat"><div class="pr-num pr-success">${fmtNum(d.completed)}</div><div class="pr-lbl">Completed</div></div>
+                    <div class="pr-stat"><div class="pr-num pr-warning">${fmtNum(d.in_progress)}</div><div class="pr-lbl">W trakcie</div></div>
+                    <div class="pr-stat"><div class="pr-num">${fmtNum(d.skipped_cached)}</div><div class="pr-lbl">Already cached</div></div>
+                    <div class="pr-stat"><div class="pr-num pr-error">${fmtNum(d.failed)}</div><div class="pr-lbl">Niepowodzenia</div></div>
+                </div>
+                <p class="pr-meta">Ostatnie uruchomienie: ${lastRun}</p>
+            `;
+        }
+
+        function renderTimeline(timeline) {
+            const card = document.getElementById('timeline-card');
+            const max = Math.max(1, ...timeline.map(d => d.views));
+            card.innerHTML = `
+                <div class="timeline-bars">
+                    ${timeline.map(d => `
+                        <div class="timeline-bar">
+                            <div class="timeline-bar-track">
+                                <div class="timeline-bar-fill" style="height: ${(d.views / max * 100)}%"></div>
+                            </div>
+                            <div class="timeline-bar-value">${d.views}</div>
+                            <div class="timeline-bar-label">${d.label}</div>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+        }
+
+        function renderTopArticles(arts) {
+            const container = document.getElementById('top-articles');
+            if (!arts.length) {
+                container.innerHTML = '<p style="text-align:center;color:var(--c-text-mute);padding:30px;">No data yet. News will appear after a few views.</p>';
+                return;
+            }
+            container.innerHTML = arts.map((a, i) => `
+                <a href="/a/${escapeHtml(a.id)}" class="top-article">
+                    <div class="top-article-rank">${i + 1}</div>
+                    ${a.image ? `<div class="top-article-img"><img src="${escapeHtml(a.image)}" alt="" loading="lazy"></div>` : ''}
+                    <div class="top-article-text">
+                        <div class="top-article-cat">${escapeHtml((a.icon || '') + ' ' + (a.category || ''))}</div>
+                        <div class="top-article-title">${escapeHtml(a.title)}</div>
+                        <div class="top-article-meta">
+                            <span>👁️ ${a.views} views</span>
+                            <span>↗ ${a.shares || 0} shares</span>
+                        </div>
+                    </div>
+                </a>
+            `).join('');
+        }
+
+        function renderTopList(targetId, items, labelKey, valueKey, suffix) {
+            const el = document.getElementById(targetId);
+            if (!items || !items.length) {
+                el.innerHTML = '<p style="text-align:center;color:var(--c-text-mute);padding:20px;font-size:13px;">Brak danych</p>';
+                return;
+            }
+            const max = Math.max(1, ...items.map(it => it[valueKey] || 0));
+            el.innerHTML = items.slice(0, 10).map(it => {
+                const v = it[valueKey] || 0;
+                const pct = (v / max * 100);
+                return `
+                    <div class="top-list-item">
+                        <div class="top-list-label">${escapeHtml(it[labelKey] || '')}</div>
+                        <div class="top-list-bar">
+                            <div class="top-list-fill" style="width:${pct}%"></div>
+                        </div>
+                        <div class="top-list-value">${v} ${suffix}</div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        loadStats();
+        setInterval(loadStats, 15000); // refresh every 15s
+    })();
+    </script>
+</body>
+</html>

@@ -3,7 +3,7 @@
    PWA offline support, smart caching strategies
    ============================================================ */
 
-const VERSION = 'feed-v1.1.0';
+const VERSION = 'feed-v1.2.0';
 const STATIC_CACHE = `${VERSION}-static`;
 const RUNTIME_CACHE = `${VERSION}-runtime`;
 const IMAGE_CACHE = `${VERSION}-images`;

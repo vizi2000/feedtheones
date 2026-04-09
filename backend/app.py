@@ -437,12 +437,28 @@ def _start_scheduler_once():
 
 
 
+
+@app.route('/pl/')
+@app.route('/pl')
+def index_pl():
+    theme, weekday = get_today_theme()
+    today_label = datetime.datetime.now().strftime('%d.%m.%Y')
+    return render_template(
+        'index_pl.html',
+        theme=theme,
+        weekday=weekday,
+        today_label=today_label,
+        all_categories=CATEGORIES,
+        all_themes=DAILY_THEMES,
+    )
+
 @app.route('/sitemap.xml')
 def sitemap():
     from flask import Response
     base = 'https://feed.theones.io'
     urls = [
         (base + '/', '1.0', 'hourly'),
+        (base + '/pl/', '1.0', 'hourly'),
         (base + '/?cat=neurodiversity', '0.9', 'daily'),
         (base + '/?cat=adhd_dev', '0.9', 'daily'),
         (base + '/?cat=models', '0.8', 'daily'),

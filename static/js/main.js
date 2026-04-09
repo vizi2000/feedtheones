@@ -159,8 +159,12 @@
         const badges = [];
         if (item.is_fun) {
             badges.push('<span class="badge fun">😄 Fun read</span>');
-        } else {
-            badges.push('<span class="badge science">🔬 Research</span>');
+        }
+        if (item.icon && item.category_name) {
+            badges.push('<span class="badge cat">' + item.icon + ' ' + escapeHtml(item.category_name) + '</span>');
+        }
+        if (item.source) {
+            badges.push('<span class="badge source">' + escapeHtml(item.source) + '</span>');
         }
 
         const imgHtml = image
